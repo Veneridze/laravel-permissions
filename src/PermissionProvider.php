@@ -13,8 +13,6 @@ class PermissionProvider extends PackageServiceProvider
             ->name('laravel-permission')
             ->hasConfigFile()
             ->publishesServiceProvider('PermissionProvider')
-            ->hasMigration('create_roles_table')
-            ->hasMigration('add_user_role')
             ->hasInstallCommand(function(InstallCommand $command) {
                 $command
                     ->publishConfigFile()
