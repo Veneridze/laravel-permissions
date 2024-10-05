@@ -28,13 +28,16 @@ class Permission implements Arrayable
     }
     public function getClassName(string $model): string
     {
+        if($model == Role::class) {
+            return "role";
+        }
         return strtolower(str_replace('\\', '.', $model));
     }
 
     public function getClass(string $model): string
     {
         return ModelInfo::forAllModels()
-            ->filter(fn($mod) => strtolower(str_replace('\\', '.', $mod->class)) == $model)
+            ->filter(fn($mod) => $this->getClassName($mod->class) == $model)
             ->first()
             ->class;
     }
@@ -178,7 +181,8 @@ class Permission implements Arrayable
 
     public function getAssignModels(): Collection
     {
-        return ModelInfo::forAllModels()
+        return
+         ModelInfo::forAllModels()
             ->filter(fn($model): bool => in_array(CanAssign::class, array_map(fn($attr) => $attr->getName(), (new ReflectionClass($model->class))->getAttributes())));
     }
     public function isPermissionModel(string $model): bool
@@ -187,6 +191,8 @@ class Permission implements Arrayable
     }
     public function getPermissionModels(): Collection
     {
-        return ModelInfo::forAllModels()->filter(fn($model): bool => $this->isPermissionModel($model->class));
+        return ModelInfo::forAllModels()
+        ->add(ModelInfo::forModel(Role::class))
+        ->filter(fn($model): bool => $this->isPermissionModel($model->class));
     }
 }

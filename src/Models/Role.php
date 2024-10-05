@@ -2,11 +2,11 @@
 namespace Veneridze\LaravelPermission\Models;
 
 
-use App\Traits\HasLogs;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Veneridze\LaravelPermission\Attributes\HasPermission;
+#[HasPermission]
 
 class Role extends Model
 {
