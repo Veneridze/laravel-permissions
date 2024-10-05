@@ -42,27 +42,11 @@ class Permission implements Arrayable
     public function getModelParameters(string $model): array
     {
         $info = ModelInfo::forModel($model);
-        $result = [
+        return array_unique([
             ...$info->attributes->filter(fn($attr) => $attr->name != 'id')->map(fn($attr) => $attr->name),
-            ...$info->relations->map(fn($attr) => $attr->name)
-        ];
-
-        //throw new Exception($model);
-        if (property_exists($model, 'form')) {
-            $reflect = new ReflectionClass($model::$form);
-            foreach ($reflect->getProperties() as $property) {
-                //if($model == JobRequestData::class) {
-                //    throw new Exception(count($property->getAttributes(Computed::class)));
-                //}
-                foreach ($property->getAttributes(Computed::class) as $attribute) {
-                    //throw new Exception($property->getName());
-                    if ($property->getName() != 'id') {
-                        $result[] = strtolower($property->getName());
-                    }
-                }
-            }
-        }
-        return array_unique($result);
+            ...$info->relations->map(fn($attr) => $attr->name),
+            ...config('permission.extend_specific_model_fields')($model)
+        ]);
     }
 
     public function getEditableModelParameters(string $model): array
@@ -115,40 +99,42 @@ class Permission implements Arrayable
 
             $class = $mod['className'];
             $classspace = strtolower($mod['class']);
-            
+
             $result[$classspace] = [
                 ...[
-                    "view" => 'Просматривать ' . $mod['label'],
-                    "update" => 'Редактировать ' . $mod['label'],
-                    "create" => 'Создавать ' . $mod['label'],
-                    "delete" => 'Удалять ' . $mod['label']
+                    "view" => ['index' => 'Просматривать ' . $mod['label']],
+                    "update" => ['index' => 'Редактировать ' . $mod['label']],
+                    "create" => ['index' => 'Создавать ' . $mod['label']],
+                    "delete" => ['index' => 'Удалять ' . $mod['label']]
                 ],
                 ...config('permission.extend_model_rules', []),
                 ...config('permission.extend_specific_model_rules')($class)
             ];
-
             foreach ($mod['fields'] as $field) {
-                if (!in_array($field, config('permission.exclude_fields'))) {
-                    $fieldname = strtolower($field['name']);
+                $fieldname = strtolower($field['name']);
+                if (!in_array($fieldname, config('permission.exclude_fields.view', []))) {
                     $result[$classspace]["view"][$fieldname] = "Просматривать {$fieldname}";
-                    if (!$field['virtual']) {
+                }
+                if (!$field['virtual']) {
+                    if (!in_array($fieldname, config('permission.exclude_fields.update', []))) {
                         $result[$classspace]["update"][$fieldname] = "Редактировать {$fieldname}";
+                    }
+
+                    if (!in_array($fieldname, config('permission.exclude_fields.create', []))) {
                         $result[$classspace]["create"][$fieldname] = "Создавать {$fieldname}";
                     }
                 }
             }
 
             foreach ($mod['relations'] as $field) {
-                if (!in_array($field, config('permission.exclude_fields'))) {
-                    $fieldname = strtolower($field['name']);
-                    $result[$classspace]["view"][$fieldname] = 'Просматривать ' . $field['label'];
-                    $result[$classspace]["update"][$fieldname] = 'Редактировать ' . $field['label'];
-                    $result[$classspace]["create"][$fieldname] = 'Создавать ' . $field['label'];
-                }
+                $fieldname = strtolower($field['name']);
+                $result[$classspace]["view"][$fieldname] = 'Просматривать ' . $field['label'];
+                $result[$classspace]["update"][$fieldname] = 'Редактировать ' . $field['label'];
+                $result[$classspace]["create"][$fieldname] = 'Создавать ' . $field['label'];
             }
         }
 
-        $this->permissions = $result;
+        $this->permissions = collect($result)->dot()->mapWithKeys(fn(string $item, $key) => [str_replace('.index', '', $key) => $item])->toArray();
     }
 
     public function exist(string $perm): bool
@@ -200,6 +186,6 @@ class Permission implements Arrayable
     }
     public function getPermissionModels(): Collection
     {
-        return ModelInfo::forAllModels()->filter(fn($model): bool => $this->isPermissionModel($model->class)); 
+        return ModelInfo::forAllModels()->filter(fn($model): bool => $this->isPermissionModel($model->class));
     }
 }
