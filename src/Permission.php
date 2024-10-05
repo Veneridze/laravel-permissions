@@ -147,7 +147,8 @@ class Permission implements Arrayable
         if (!$this->exist(strtolower($perm))) {
             throw new PermissionException("Право {$perm} не существует");
         }
-        return $this->canRole($user->role['id'], strtolower($perm));
+        $role = Role::findOrFail($user->role['id']);
+        return $this->canRole($role, strtolower($perm));
     }
 
     public static function canAccess($user, Model $model): bool
