@@ -1,0 +1,22 @@
+{
+    "name": "veneridze/laravel-permission",
+    "require": {
+        "spatie/laravel-model-info": "^2.0",
+        "laravel/framework": "^11.25",
+        "spatie/laravel-data": "^4.10",
+        "spatie/laravel-package-tools": "^1.16"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Veneridze\\LaravelPermission\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Veneridze",
+            "email": "viacheslav.kopaev@yandex.ru"
+        }
+    ],
+    "minimum-stability": "stable"
+}
