@@ -18,29 +18,18 @@ class PermissionProvider extends PackageServiceProvider
             ->hasInstallCommand(function(InstallCommand $command) {
                 $command
                     ->publishConfigFile()
-                    //->publishAssets()
                     ->publishMigrations()
                     ->copyAndRegisterServiceProviderInApp();
-                    //->askToStarRepoOnGitHub();
-            });;
-            //->hasMigration('create_media_table')
-            //->hasViews('media-library')
-            //->hasCommands([
-            //    RegenerateCommand::class,
-            //    ClearCommand::class,
-            //    CleanCommand::class,
-            //]);
+            });
     }
 
     public function packageBooted(): void
     {
-        //$mediaClass = config('media-library.media_model', Media::class);
 
-        //$mediaClass::observe(new MediaObserver);
     }
 
     public function packageRegistered(): void
     {
-        $this->app->singleton(Permission::class, fn($app) => new Permission());
+        $this->app->singleton(Permission::class, fn($app): Permission => new Permission());
     }
 }
