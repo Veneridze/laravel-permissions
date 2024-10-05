@@ -100,16 +100,16 @@ class Permission implements Arrayable
             $class = $mod['className'];
             $classspace = strtolower($mod['class']);
 
-            $result[$classspace] = [
-                ...[
+            $result[$classspace] = array_merge_recursive(
+                [
                     "view" => ['index' => 'Просматривать ' . $mod['label']],
                     "update" => ['index' => 'Редактировать ' . $mod['label']],
                     "create" => ['index' => 'Создавать ' . $mod['label']],
                     "delete" => ['index' => 'Удалять ' . $mod['label']]
                 ],
-                ...config('permission.extend_model_rules', []),
-                ...config('permission.extend_specific_model_rules')($class)
-            ];
+                config('permission.extend_model_rules', []),
+                config('permission.extend_specific_model_rules')($class)
+            );
             foreach ($mod['fields'] as $field) {
                 $fieldname = strtolower($field['name']);
                 if (!in_array($fieldname, config('permission.exclude_fields.view', []))) {
