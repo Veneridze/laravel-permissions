@@ -12,6 +12,7 @@ class PermissionProvider extends PackageServiceProvider
         $package
             ->name('laravel-permission')
             ->hasConfigFile()
+            ->publishesServiceProvider('PermissionProvider')
             ->hasInstallCommand(function(InstallCommand $command) {
                 $command
                     ->publishConfigFile()
