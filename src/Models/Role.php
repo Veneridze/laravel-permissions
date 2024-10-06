@@ -2,9 +2,9 @@
 namespace Veneridze\LaravelPermission\Models;
 
 
-use Illuminate\Foundation\Auth\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Auth;
 use Veneridze\LaravelPermission\Attributes\HasPermission;
 #[HasPermission]
 
@@ -19,6 +19,6 @@ class Role extends Model
     ];
 
     public function users(): HasMany {
-        return $this->hasMany(User::class);
+        return $this->hasMany(Auth::user()::class);
     }
 }
