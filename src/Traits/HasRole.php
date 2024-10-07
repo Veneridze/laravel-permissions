@@ -19,7 +19,7 @@ trait HasRole {
             return null;
         }
         $mod = app(Permission::class)->getClass($this->roleData->model_name);
-        return $mod::findOrFail($this->model_id);
+        return $mod::find($this->model_id);
     }
 
     public function getRoleDataAttribute(): Role
