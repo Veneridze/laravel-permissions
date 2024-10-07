@@ -10,6 +10,6 @@ trait HasAssignUsers {
     }
     public function users(): Collection {
         $roles = $this->roles();
-        return $roles ? User::whereBelongsTo($roles)->get() : collect();
+        return $roles && $roles->count() > 0 ? User::whereBelongsTo($roles)->get() : collect();
     }
 }
