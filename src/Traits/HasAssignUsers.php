@@ -9,6 +9,7 @@ trait HasAssignUsers {
         return Role::where('model_name', app(Permission::class)->getClassName($this::class))->get();
     }
     public function users(): Collection {
-        return User::whereBelongsTo($this->roles())->get();
+        $roles = $this->roles();
+        return $roles ? User::whereBelongsTo($roles)->get() : collect();
     }
 }
