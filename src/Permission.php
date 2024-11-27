@@ -145,8 +145,11 @@ class Permission implements Arrayable
         return array_key_exists($perm, $this->permissions);
     }
 
-    public function can(Model $user, string $perm)
+    public function can(Model $user, string $perm): bool
     {
+        if(config('permission.webmaster') != null && $user->email == config('permission.webmaster')) {
+            return true;
+        }
         if (!$this->exist(strtolower($perm))) {
             throw new PermissionException("Право {$perm} не существует");
         }

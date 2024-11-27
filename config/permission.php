@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'webmaster' => env('WEBMASTER_EMAIL', null),
     'extend_single_rules' => [
         
     ],
