@@ -5,6 +5,7 @@ namespace Veneridze\LaravelPermission;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Config;
 use ReflectionClass;
 use Spatie\ModelInfo\ModelInfo;
 use Illuminate\Database\Eloquent\Model;
@@ -45,11 +46,18 @@ class Permission implements Arrayable
     public function getModelParameters(string $model): array
     {
         $info = ModelInfo::forModel($model);
-        return array_unique([
+        $arr = array_unique([
             ...$info->attributes->filter(fn($attr) => $attr->name != 'id')->map(fn($attr) => $attr->name),
-            ...$info->relations->map(fn($attr) => $attr->name),
-            ...config('permission.extend_specific_model_fields')($model)
+            ...$info->relations->map(fn($attr) => $attr->name)
         ]);
+        if (Config::has('permission.extend_specific_model_fields')) {
+            $cl = config('permission.extend_specific_model_fields');
+            $arr = array_unique([
+                ...$arr,
+                (new $cl)($model)
+            ]);
+        }
+        return $arr;
     }
 
     public function getEditableModelParameters(string $model): array
@@ -110,9 +118,26 @@ class Permission implements Arrayable
                     "create" => ['index' => 'Создавать ' . $mod['label']],
                     "delete" => ['index' => 'Удалять ' . $mod['label']]
                 ],
-                config('permission.extend_model_rules', []),
-                config('permission.extend_specific_model_rules')($class)
+                // config('permission.extend_model_rules', []),
+                // config('permission.extend_specific_model_rules')($class)
             );
+            if (Config::has('permission.extend_model_rules')) {
+                $cl = config('permission.extend_model_rules');
+                $result[$classspace] = array_merge_recursive([
+                    $result[$classspace],
+                    (new $cl)()
+                ]);
+            }
+
+            if (Config::has('permission.extend_specific_model_fields')) {
+                $cl = config('permission.extend_specific_model_fields');
+                $result[$classspace] = array_merge_recursive([
+                    $result[$classspace],
+                    (new $cl)($class)
+                ]);
+            }
+
+
             foreach ($mod['fields'] as $field) {
                 $fieldname = strtolower($field['name']);
                 if (!in_array($fieldname, config('permission.exclude_fields.view', []))) {
