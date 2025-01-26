@@ -118,11 +118,10 @@ class Permission implements Arrayable
                     "create" => ['index' => 'Создавать ' . $mod['label']],
                     "delete" => ['index' => 'Удалять ' . $mod['label']]
                 ],
-                // config('permission.extend_model_rules', []),
-                // config('permission.extend_specific_model_rules')($class)
+                config('permission.extend_model_rules', []),
             );
-            if (Config::has('permission.extend_model_rules')) {
-                $cl = config('permission.extend_model_rules');
+            if (Config::has('permission.extend_specific_model_rules')) {
+                $cl = config('permission.extend_specific_model_rules');
                 $result[$classspace] = array_merge_recursive([
                     $result[$classspace],
                     (new $cl)()
