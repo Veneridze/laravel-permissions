@@ -24,7 +24,10 @@ class GenericPolicy
     public function view(User $user, Model $model): bool
     {
         $perm = app(Permission::class)->getClassName($this->model);
-        return app(Permission::class)->can($user, "{$perm}.view") && app(Permission::class)->canAccess($user, $model);
+        return
+
+            app(Permission::class)->can($user, "{$perm}.view") && app(Permission::class)->canAccess($user, $model) ||
+            method_exists('isOwner', $model) ? $model->isOwner($user) : false;
     }
 
     /**
@@ -42,7 +45,8 @@ class GenericPolicy
     public function update(User $user, Model $model): bool
     {
         $perm = app(Permission::class)->getClassName($this->model);
-        return app(Permission::class)->can($user, "{$perm}.update") && app(Permission::class)->canAccess($user, $model);
+        return app(Permission::class)->can($user, "{$perm}.update") && app(Permission::class)->canAccess($user, $model) ||
+            method_exists('isOwner', $model) ? $model->isOwner($user) : false;
     }
 
     /**
@@ -51,7 +55,8 @@ class GenericPolicy
     public function delete(User $user, Model $model): bool
     {
         $perm = app(Permission::class)->getClassName($this->model);
-        return app(Permission::class)->can($user, "{$perm}.delete") && app(Permission::class)->canAccess($user, $model);
+        return app(Permission::class)->can($user, "{$perm}.delete") && app(Permission::class)->canAccess($user, $model) ||
+            method_exists('isOwner', $model) ? $model->isOwner($user) : false;
     }
 
     /**

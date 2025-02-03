@@ -171,7 +171,7 @@ class Permission implements Arrayable
 
     public function can(Model $user, string $perm): bool
     {
-        return true;
+        // return true;
         if (config('permission.webmaster') != null && $user->email == config('permission.webmaster')) {
             return true;
         }
@@ -204,7 +204,7 @@ class Permission implements Arrayable
     }
     public function canRole(Role $role, string $perm): bool
     {
-        return true;
+        // return true;
         return in_array(strtolower($perm), $role->perms ?? []);
     }
 
