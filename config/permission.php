@@ -8,8 +8,8 @@ return [
     'extend_model_rules' => [],
     'exclude_fields' => [
         "view" => [],
-        "update" => ['id', 'created_at', 'updated_at'],
-        "create" => ['id', 'created_at', 'updated_at']
+        "update" => ['id', 'created_at', 'updated_at', 'created_by', 'updated_by'],
+        "create" => ['id', 'created_at', 'updated_at', 'created_by', 'updated_by']
     ],
     // 'extend_specific_model_rules' => null,
     // 'extend_specific_model_fields' => null
